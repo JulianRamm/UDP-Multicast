@@ -28,7 +28,7 @@ try:
             print('timed out, no more responses')
             break
         else:
-            print(sys.stderr, 'received "%s" from %s' % (data, server))
+            print('received "%s" from %s' % (data, server))
 
 finally:
     print('closing socket')

@@ -2,6 +2,7 @@ import socket
 import struct
 import sys
 
+ack = "ack"
 multicast_group = '224.3.29.71'
 server_address = ('', 10000)
 
@@ -21,7 +22,7 @@ while True:
     data, address = sock.recvfrom(1024)
 
     print('received %s bytes from %s' % (len(data), address))
-    print(sys.stderr, data)
+    print(data)
 
-    print(sys.stderr, 'sending acknowledgement to', address)
-    sock.sendto('ack', address)
+    print('sending acknowledgement to', address)
+    sock.sendto(ack.encode("ascii"), address)
