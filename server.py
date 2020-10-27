@@ -24,19 +24,20 @@ class FrameSegment(object):
         Compress image and Break down
         into data segments
         """
-        compress_img = cv2.imencode('.jpg', img)[1]
-        dat = compress_img.tostring()
-        size = len(dat)
-        count = math.ceil(size / self.MAX_IMAGE_DGRAM)
-        array_pos_start = 0
-        while count:
-            array_pos_end = min(size, array_pos_start + self.MAX_IMAGE_DGRAM)
-            self.s.sendto(struct.pack("B", count) +
-                          dat[array_pos_start:array_pos_end],
-                          (self.addr, self.port)
-                          )
-            array_pos_start = array_pos_end
-            count -= 1
+        if img is not None:
+            compress_img = cv2.imencode('.jpg', img)[1]
+            dat = compress_img.tobytes()
+            size = len(dat)
+            count = math.ceil(size / self.MAX_IMAGE_DGRAM)
+            array_pos_start = 0
+            while count:
+                array_pos_end = min(size, array_pos_start + self.MAX_IMAGE_DGRAM)
+                self.s.sendto(struct.pack("B", count) +
+                            dat[array_pos_start:array_pos_end],
+                            (self.addr, self.port)
+                            )
+                array_pos_start = array_pos_end
+                count -= 1
 
 
 def main():
@@ -69,7 +70,6 @@ def main():
         # Send data to the multicast group
         print('Enviando video%s' % (str(canal) + ".mp4"))
         while cap.isOpened():
-            print(cap.isOpened())
             ret, frame = cap.read()
             fs.udp_frame(frame)
         # Look for responses from all recipients
