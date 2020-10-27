@@ -2,9 +2,10 @@ import socket
 import struct
 import numpy as np
 import cv2
+import keyboard
 
 MAX_DGRAM = 2 ** 16
-
+pausa= False
 
 def dump_buffer(s):
     """ Emptying buffer frame """
@@ -33,18 +34,28 @@ def main():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
     dat = b''
     dump_buffer(sock)
-    # Receive/respond loop
-    while True:
-        print('\nRecibiendo paquete...')
-        data, address = sock.recvfrom(MAX_DGRAM)
 
-        if struct.unpack("B", data[0:1])[0] > 1:
+    while (True):
+        data, address = sock.recvfrom(MAX_DGRAM)
+        print("recibiendo video")
+
+        if(data=="acabe".encode("ascii")):
+            print("llegue a acabe")
+            cv2.destroyAllWindows()
+            sock.close()
+            main()
+        if (struct.unpack("B", data[0:1])[0] > 1):
             dat += data[1:]
         else:
             dat += data[1:]
-            img = cv2.imdecode(np.fromstring(dat, dtype=np.uint8), 1)
+            img = cv2.imdecode(np.frombuffer(dat, dtype=np.uint8), 1)
             cv2.imshow('frame', img)
             if cv2.waitKey(1) & 0xFF == ord('q'):
+                sock.sendto("stop".encode("ascii"),address)
+                print("Stop")
+                cv2.destroyAllWindows()
+                sock.close()
+                main()
                 break
             dat = b''
 

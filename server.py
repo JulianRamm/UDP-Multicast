@@ -70,8 +70,18 @@ def main():
         # Send data to the multicast group
         print('Enviando video%s' % (str(canal) + ".mp4"))
         while cap.isOpened():
+            #print(sock.recvfrom(16))
             ret, frame = cap.read()
             fs.udp_frame(frame)
+            #si se acaba el video, cierra todo y vuelve al menu
+            if(frame is None):
+                print("acabo el video")
+                cap.release()
+                sock.sendto("acabe".encode("ascii"),multicast_group)
+                main()
+                break
+            #if(data=="stop".encode("ascii")):
+            #    print("pausa")
         # Look for responses from all recipients
         while True:
             print('waiting to receive')
