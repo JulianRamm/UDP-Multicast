@@ -35,8 +35,9 @@ def main():
     dump_buffer(sock)
     # Receive/respond loop
     while True:
-        print('\nEsperando opciones...')
+        print('\nRecibiendo paquete...')
         data, address = sock.recvfrom(MAX_DGRAM)
+
         if struct.unpack("B", data[0:1])[0] > 1:
             dat += data[1:]
         else:
@@ -44,9 +45,9 @@ def main():
             img = cv2.imdecode(np.fromstring(dat, dtype=np.uint8), 1)
             cv2.imshow('frame', img)
             if cv2.waitKey(1) & 0xFF == ord('q'):
-                break;
+                break
             dat = b''
-        sock.sendto(ack.encode("ascii"), address)
+
     cv2.destroyAllWindows()
     sock.close()
 

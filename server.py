@@ -25,9 +25,9 @@ class FrameSegment(object):
         into data segments
         """
         compress_img = cv2.imencode('.jpg', img)[1]
-        dat = compress_img.tobytes()
+        dat = compress_img.tostring()
         size = len(dat)
-        count = math.ceil(size / (self.MAX_IMAGE_DGRAM))
+        count = math.ceil(size / self.MAX_IMAGE_DGRAM)
         array_pos_start = 0
         while count:
             array_pos_end = min(size, array_pos_start + self.MAX_IMAGE_DGRAM)
@@ -63,11 +63,13 @@ def main():
         print("----------------")
         canal = int(input("Ingrese el número del canal al que quiere conectarse (1, 2 o 3): "))
         multicast_group = (multicastIp, 10000)
-        videoToStream = "./videos/video1.mp4"
+        videoToStream = "./videos/video"+str(canal)+".mp4"
+        print(videoToStream)
         cap = cv2.VideoCapture(videoToStream)
         # Send data to the multicast group
         print('Enviando video%s' % (str(canal) + ".mp4"))
         while cap.isOpened():
+            print(cap.isOpened())
             ret, frame = cap.read()
             fs.udp_frame(frame)
         # Look for responses from all recipients
